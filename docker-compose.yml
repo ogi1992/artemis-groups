@@ -1,0 +1,44 @@
+version: '3.6'
+
+services:
+   artemis:
+      image: vromero/activemq-artemis:2.4.0
+      ports:
+         - 61616:61616
+         - 8161:8161
+      environment: 
+         - ARTEMIS_USERNAME=avelon
+         - ARTEMIS_PASSWORD=bluechip
+      hostname: artemis
+      container_name: artemis
+      networks:
+         - artemis-test
+   producer:
+      image: producer:latest
+      ports:
+         - 8081:8081
+      volumes:
+         - artemis-test:/opt/
+      hostname: producer
+      container_name: producer
+      networks:
+         - artemis-test
+      depends_on:
+         - artemis
+   consumer:
+      image: consumer:latest
+      ports:
+         - 8082:8082
+      volumes:
+         - artemis-test:/opt/
+      hostname: consumer
+      container_name: consumer
+      networks:
+         - artemis-test
+      depends_on:
+         - artemis
+volumes:
+  artemis-test:
+    external: true
+networks:
+  artemis-test:
