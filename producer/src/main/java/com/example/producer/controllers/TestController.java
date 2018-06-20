@@ -27,12 +27,13 @@ public class TestController {
             Map<String, Object> headers = new HashMap<>();
             int groupId = random.nextInt(10000) + 1;
             headers.put("JMSXGroupID", groupId);
-            Integer value = messageCount.get(String.valueOf(groupId));
+            String group = String.valueOf(groupId);
+            Integer value = messageCount.get(group);
             if (value != null) {
                 value += 1;
-                messageCount.put(String.valueOf(groupId), value);
+                messageCount.put(group, value);
             } else {
-                messageCount.put(String.valueOf(groupId), 1);
+                messageCount.put(group, 1);
             }
             jmsMessagingTemplate.convertAndSend(QUEUE_NAME, "testMessage", headers);
         }

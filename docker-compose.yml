@@ -14,7 +14,11 @@ services:
       networks:
          - artemis-test
    producer:
-      image: producer:latest
+      build: 
+         context: producer/
+         args:
+           jar: producer/build/libs/producer.jar
+           port: 8081
       ports:
          - 8081:8081
       volumes:
@@ -26,7 +30,11 @@ services:
       depends_on:
          - artemis
    consumer:
-      image: consumer:latest
+      build: 
+        context: consumer/
+        args: 
+          jar: consumer/build/libs/consumer.jar
+          port: 8082
       ports:
          - 8082:8082
       volumes:
