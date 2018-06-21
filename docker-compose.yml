@@ -15,14 +15,13 @@ services:
          - artemis-test
    producer:
       build: 
-         context: producer/
+         context: producer
          args:
-           jar: producer/build/libs/producer.jar
+           jar: build/libs/producer.jar
            port: 8081
+      image: producer
       ports:
          - 8081:8081
-      volumes:
-         - artemis-test:/opt/
       hostname: producer
       container_name: producer
       networks:
@@ -31,22 +30,18 @@ services:
          - artemis
    consumer:
       build: 
-        context: consumer/
+        context: consumer
         args: 
-          jar: consumer/build/libs/consumer.jar
+          jar: build/libs/consumer.jar
           port: 8082
+      image: consumer
       ports:
          - 8082:8082
-      volumes:
-         - artemis-test:/opt/
       hostname: consumer
       container_name: consumer
       networks:
          - artemis-test
       depends_on:
          - artemis
-volumes:
-  artemis-test:
-    external: true
 networks:
   artemis-test:
