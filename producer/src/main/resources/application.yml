@@ -4,7 +4,7 @@ server:
     context-path: /producer
 spring:
   artemis:
-    host: 172.21.0.2
+    host: artemis
     port: 61616
     mode: native
     user: avelon

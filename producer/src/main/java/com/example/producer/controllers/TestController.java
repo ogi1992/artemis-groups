@@ -1,14 +1,14 @@
 package com.example.producer.controllers;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Random;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.jms.core.JmsMessagingTemplate;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
 
 @RestController
 public class TestController {
@@ -16,31 +16,32 @@ public class TestController {
     @Autowired
     JmsMessagingTemplate jmsMessagingTemplate;
 
-    public Map<String, Integer> messageCount = new HashMap<>();
 
     public static final String QUEUE_NAME = "messagesDestination";
 
-    @GetMapping(value = "/sendMessages", produces = MediaType.APPLICATION_JSON_VALUE)
-    public String test() {
-        Random random = new Random();
-        for (int i = 0; i < 1000000; i++) {
-            Map<String, Object> headers = new HashMap<>();
-            int groupId = random.nextInt(10000) + 1;
+    @GetMapping(value = "/sendMessages/{nrOfGroups}/{nrOfMessages}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public String test(@PathVariable int nrOfGroups, @PathVariable int nrOfMessages) {
+        final Random random = new Random();
+        final Map<Integer, Integer> messageCount = new HashMap<>();
+        long start = System.currentTimeMillis();
+
+        for (int i = 0; i < nrOfMessages; i++) {
+            int groupId = random.nextInt(nrOfGroups) + 1;
+
+            final Integer count = messageCount.compute(groupId, (k, v) -> v == null ? 1 : v + 1);
+
+            final Map<String, Object> headers = new HashMap<>();
             headers.put("JMSXGroupID", groupId);
-            String group = String.valueOf(groupId);
-            Integer value = messageCount.get(group);
-            if (value != null) {
-                value += 1;
-                messageCount.put(group, value);
-            } else {
-                messageCount.put(group, 1);
+
+            jmsMessagingTemplate.convertAndSend(QUEUE_NAME, count, headers);
+
+            if ((i + 1) % 1000 == 0) {
+                long stop = System.currentTimeMillis();
+                System.out.println("Sent " + (i + 1) + " messages in " + (stop - start) + "ms");
             }
-            jmsMessagingTemplate.convertAndSend(QUEUE_NAME, "testMessage", headers);
+
         }
-        System.out.println("CONVERTING MESSAGES");
-        jmsMessagingTemplate.convertAndSend("consumer1", messageCount);
-        jmsMessagingTemplate.convertAndSend("consumer2", messageCount);
-        System.out.println("SENT GROUP INFO FROM PRODUCER " + messageCount.keySet().size());
+
         return "OK";
     }
 }
