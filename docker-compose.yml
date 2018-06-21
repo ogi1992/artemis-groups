@@ -2,11 +2,11 @@ version: '3.6'
 
 services:
    artemis:
-      image: vromero/activemq-artemis:2.4.0
+      image: vromero/activemq-artemis:2.4.0-alpine
       ports:
          - 61616:61616
          - 8161:8161
-      environment: 
+      environment:
          - ARTEMIS_USERNAME=avelon
          - ARTEMIS_PASSWORD=bluechip
       hostname: artemis
