@@ -1,3 +1,6 @@
-FROM frolvlad/alpine-oraclejdk8:slim
-EXPOSE 8081
-ENTRYPOINT ["java","-Djava.security.egd=file:/dev/./urandom","-jar","/opt/jars/producer.jar"]
+FROM java:openjdk-8-jre-alpine
+ARG jar
+ARG port
+EXPOSE $port
+COPY $jar app.jar
+ENTRYPOINT ["java","-Djava.security.egd=file:/dev/./urandom","-jar","/app.jar"]
