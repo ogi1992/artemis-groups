@@ -9,3 +9,6 @@ spring:
     mode: native
     user: avelon
     password: bluechip
+logging:
+  level:
+   org.apache.activemq.artemis: info

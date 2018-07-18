@@ -3,6 +3,7 @@ package com.example.consumer.jms;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicLong;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.ObjectMessage;
@@ -12,7 +13,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class JmsConsumer {
 
-    public Map<String, Integer> groupInfo = new HashMap<>();
+    private Map<String, Integer> groupInfo = new HashMap<>();
+    private static final AtomicLong messageCount = new AtomicLong();
 
     @JmsListener(destination = "messagesDestination")
     public void onMessage(Message message) {
@@ -24,6 +26,9 @@ public class JmsConsumer {
 
             if (!Objects.equals(value, count)) {
                 System.out.println("Consumer: Invalild group count for group " + group + ": expected=" + value + ", actual=" + count);
+            }
+            if (messageCount.incrementAndGet() % 100 == 0) {
+                System.out.println(messageCount.get() + " messages received");
             }
         } catch (JMSException e) {
             e.printStackTrace();
